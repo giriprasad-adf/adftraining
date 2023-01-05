@@ -1,0 +1,126 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-giriprasad-dev-datafactory"
+		},
+		"AdventureWorks_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AdventureWorks'"
+		},
+		"AzureBlobStorage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'",
+			"defaultValue": "DefaultEndpointsProtocol=https;AccountName=adfgiriprasad;"
+		},
+		"TaxiDataDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'TaxiDataDB'"
+		},
+		"adf_giriprasad_datalake_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'adf_giriprasad_datalake'"
+		},
+		"adf_giriprasad_sqldb_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'adf_giriprasad_sqldb'"
+		},
+		"adf_giriprasad_datalake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adfgiriprasaddatalake.dfs.core.windows.net/"
+		},
+		"adf_giriprasad_dev_kv_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://adf-giriprasad-dev-kv.vault.azure.net/"
+		},
+		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart": {
+			"type": "string",
+			"defaultValue": "@{addhours(trigger().scheduledTime, -2)}"
+		},
+		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd": {
+			"type": "string",
+			"defaultValue": "@trigger().scheduledTime"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adf-giriprasad-dev-datafactory_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AdventureWorks_connectionString": {
+						"value": "[parameters('AdventureWorks_connectionString')]"
+					},
+					"TaxiDataDB_connectionString": {
+						"value": "[parameters('TaxiDataDB_connectionString')]"
+					},
+					"adf_giriprasad_datalake_accountKey": {
+						"value": "[parameters('adf_giriprasad_datalake_accountKey')]"
+					},
+					"adf_giriprasad_sqldb_connectionString": {
+						"value": "[parameters('adf_giriprasad_sqldb_connectionString')]"
+					},
+					"AzureBlobStorage_connectionString": {
+						"value": "[parameters('AzureBlobStorage_connectionString')]"
+					},
+					"adf_giriprasad_datalake_properties_typeProperties_url": {
+						"value": "[parameters('adf_giriprasad_datalake_properties_typeProperties_url')]"
+					},
+					"adf_giriprasad_dev_kv_properties_typeProperties_baseUrl": {
+						"value": "[parameters('adf_giriprasad_dev_kv_properties_typeProperties_baseUrl')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "adf-giriprasad-dev-datafactory_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart": {
+						"value": "[parameters('Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart')]"
+					},
+					"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd": {
+						"value": "[parameters('Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-giriprasad-dev-datafactory_ArmTemplate_0')]"
+			]
+		}
+	]
+}

@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-giriprasad-dev-datafactory"
+		},
+		"AdventureWorks_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage_connectionString": {
+			"value": "DefaultEndpointsProtocol=https;AccountName=adfgiriprasad;"
+		},
+		"TaxiDataDB_connectionString": {
+			"value": ""
+		},
+		"adf_giriprasad_datalake_accountKey": {
+			"value": ""
+		},
+		"adf_giriprasad_sqldb_connectionString": {
+			"value": ""
+		},
+		"adf_giriprasad_datalake_properties_typeProperties_url": {
+			"value": "https://adfgiriprasaddatalake.dfs.core.windows.net/"
+		},
+		"adf_giriprasad_dev_kv_properties_typeProperties_baseUrl": {
+			"value": "https://adf-giriprasad-dev-kv.vault.azure.net/"
+		},
+		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart": {
+			"value": "@{addhours(trigger().scheduledTime, -2)}"
+		},
+		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd": {
+			"value": "@trigger().scheduledTime"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
