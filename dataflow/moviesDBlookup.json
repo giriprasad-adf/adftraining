@@ -1,0 +1,95 @@
+{
+	"name": "moviesDBlookup",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "moviesdbip",
+						"type": "DatasetReference"
+					},
+					"name": "moviesdbcsv"
+				},
+				{
+					"dataset": {
+						"referenceName": "moviesDBcopyinput",
+						"type": "DatasetReference"
+					},
+					"name": "moviesdbcopycsv"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "moviesdbout",
+						"type": "DatasetReference"
+					},
+					"name": "moviesDBexistes"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          movie as string,",
+				"          title as string,",
+				"          genres as string,",
+				"          year as string,",
+				"          Rating as string,",
+				"          {Rotton Tomato} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> moviesdbcsv",
+				"source(output(",
+				"          movie as string,",
+				"          title as string,",
+				"          genres as string,",
+				"          year as string,",
+				"          Rating as string,",
+				"          {Rotton Tomato} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> moviesdbcopycsv",
+				"moviesdbcsv, moviesdbcopycsv lookup(moviesdbcsv@movie == moviesdbcopycsv@movie,",
+				"     multiple: false,",
+				"     pickup: 'first',",
+				"     desc(moviesdbcopycsv@Rating, true),",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 select(mapColumn(",
+				"          movie = moviesdbcsv@movie,",
+				"          title = moviesdbcsv@title,",
+				"          genres = moviesdbcsv@genres,",
+				"          year = moviesdbcsv@year,",
+				"          Rating = moviesdbcsv@Rating,",
+				"          {Rotton Tomato} = moviesdbcsv@{Rotton Tomato},",
+				"          movie1 = moviesdbcopycsv@movie,",
+				"          title1 = moviesdbcopycsv@title,",
+				"          genres1 = moviesdbcopycsv@genres,",
+				"          year1 = moviesdbcopycsv@year,",
+				"          Rating1 = moviesdbcopycsv@Rating,",
+				"          {Rotton Tomato1} = moviesdbcopycsv@{Rotton Tomato}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['moviesDBlookup'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> moviesDBexistes"
+			]
+		}
+	}
+}

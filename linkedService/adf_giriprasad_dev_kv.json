@@ -1,0 +1,11 @@
+{
+	"name": "adf_giriprasad_dev_kv",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://adf-giriprasad-dev-kv.vault.azure.net/"
+		}
+	}
+}

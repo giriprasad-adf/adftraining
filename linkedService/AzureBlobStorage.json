@@ -1,0 +1,20 @@
+{
+	"name": "AzureBlobStorage",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"connectionString": "DefaultEndpointsProtocol=https;AccountName=adfgiriprasad;",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "adf_giriprasad_dev_kv",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "adfgiriprasadstorageaccountconnectionstring",
+				"secretVersion": "85c191b21ed44368b54e79c75a23e452"
+			}
+		}
+	}
+}
