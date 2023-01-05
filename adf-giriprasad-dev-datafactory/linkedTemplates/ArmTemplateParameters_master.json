@@ -26,12 +26,6 @@
 		"adf_giriprasad_dev_kv_properties_typeProperties_baseUrl": {
 			"value": "https://adf-giriprasad-dev-kv.vault.azure.net/"
 		},
-		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart": {
-			"value": "@{addhours(trigger().scheduledTime, -2)}"
-		},
-		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd": {
-			"value": "@trigger().scheduledTime"
-		},
 		"containerUri": {
 			"value": ""
 		},

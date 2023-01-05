@@ -36,14 +36,6 @@
 			"type": "string",
 			"defaultValue": "https://adf-giriprasad-dev-kv.vault.azure.net/"
 		},
-		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart": {
-			"type": "string",
-			"defaultValue": "@{addhours(trigger().scheduledTime, -2)}"
-		},
-		"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd": {
-			"type": "string",
-			"defaultValue": "@trigger().scheduledTime"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -109,12 +101,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart": {
-						"value": "[parameters('Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowStart')]"
-					},
-					"Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd": {
-						"value": "[parameters('Trigger_l8h_properties_CopyPipeline_l8h_parameters_windowEnd')]"
 					}
 				}
 			},
