@@ -329,6 +329,44 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy data1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "crimes",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"crimescsv": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
 					}
 				],
 				"policy": {
@@ -339,7 +377,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CrimesJson')]",
-				"[concat(variables('factoryId'), '/datasets/crimescsv')]"
+				"[concat(variables('factoryId'), '/datasets/crimescsv')]",
+				"[concat(variables('factoryId'), '/dataflows/crimes')]"
 			]
 		},
 		{
@@ -1768,7 +1807,7 @@
 						"          time = right(date,12)) ~> derivedColumn1",
 						"derivedColumn1 aggregate(groupBy({day of week} = dayOfWeek(toDate({date only},'yyyy-mm-dd'))),",
 						"     iucr = count(iucr)) ~> aggregate1",
-						"derivedColumn1 filter(year(toDate({date only},'yyyy-mm-dd'))==2016) ~> filter1",
+						"derivedColumn1 filter(year(toDate({date only},'yyyy-mm-dd'))==2022) ~> filter1",
 						"filter1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
