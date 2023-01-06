@@ -78,7 +78,7 @@
 				"          time = right(date,12)) ~> derivedColumn1",
 				"derivedColumn1 aggregate(groupBy({day of week} = dayOfWeek(toDate({date only},'yyyy-mm-dd'))),",
 				"     iucr = count(iucr)) ~> aggregate1",
-				"derivedColumn1 filter(year(toDate({date only},'yyyy-mm-dd'))==2016) ~> filter1",
+				"derivedColumn1 filter(year(toDate({date only},'yyyy-mm-dd'))==2022) ~> filter1",
 				"filter1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
