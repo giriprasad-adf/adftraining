@@ -719,6 +719,47 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_giriprasad_sqldb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"table": "crimes2016"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adf_giriprasad_sqldb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_giriprasad_sqldb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "",
+					"table": "aggregate"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adf_giriprasad_sqldb')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CrimesJson')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1000,6 +1041,27 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AdventureWorks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/crimes')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_giriprasad_sqldb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "",
+					"table": "2016crimes"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adf_giriprasad_sqldb')]"
 			]
 		},
 		{
@@ -1622,6 +1684,119 @@
 				"[concat(variables('factoryId'), '/datasets/TripDataCSV')]",
 				"[concat(variables('factoryId'), '/datasets/TripFaresSQLtable')]",
 				"[concat(variables('factoryId'), '/datasets/JoinAndAggregateSink')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/crimes')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "crimescsv",
+								"type": "DatasetReference"
+							},
+							"name": "crimescsv"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "crimes",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable2",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "filter1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          id as integer,",
+						"          case_number as string,",
+						"          date as string,",
+						"          block as string,",
+						"          iucr as string,",
+						"          primary_type as string,",
+						"          description as string,",
+						"          location_description as string,",
+						"          arrest as boolean,",
+						"          domestic as boolean,",
+						"          beat as short,",
+						"          district as short,",
+						"          ward as short,",
+						"          community_area as short,",
+						"          fbi_code as string,",
+						"          x_coordinate as integer,",
+						"          y_coordinate as integer,",
+						"          year as short,",
+						"          updated_on as string,",
+						"          latitude as double,",
+						"          longitude as double,",
+						"          {:@computed_region_awaf_s7ux} as short,",
+						"          {:@computed_region_6mkv_f3dw} as short,",
+						"          {:@computed_region_vrxf_vc4k} as short,",
+						"          {:@computed_region_bdys_3d7i} as short,",
+						"          {:@computed_region_43wa_7qmu} as short,",
+						"          {:@computed_region_rpca_8um6} as short,",
+						"          {:@computed_region_d9mm_jgwp} as short,",
+						"          {:@computed_region_d3ds_rm58} as short",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> crimescsv",
+						"crimescsv derive({date only} = left(date,10),",
+						"          time = right(date,12)) ~> derivedColumn1",
+						"derivedColumn1 aggregate(groupBy({day of week} = dayOfWeek(toDate({date only},'yyyy-mm-dd'))),",
+						"     iucr = count(iucr)) ~> aggregate1",
+						"derivedColumn1 filter(year(toDate({date only},'yyyy-mm-dd'))==2016) ~> filter1",
+						"filter1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/crimescsv')]",
+				"[concat(variables('factoryId'), '/datasets/crimes')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTable2')]"
 			]
 		},
 		{

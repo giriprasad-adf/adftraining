@@ -11,20 +11,107 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'",
 			"defaultValue": "DefaultEndpointsProtocol=https;AccountName=adfgiriprasad;"
-		},
-		"Trigger_smu_properties_pipeline_parameters_windowStart": {
-			"type": "string",
-			"defaultValue": "@trigger().outputs.windowStartTime"
-		},
-		"Trigger_smu_properties_pipeline_parameters_windowEnd": {
-			"type": "string",
-			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/moviesdbSQLop')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_giriprasad_sqldb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"table": "moviesdb"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/moviesdbip')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_giriprasad_datalake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "moviesDB.csv",
+						"folderPath": "input",
+						"fileSystem": "moviesdb"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "movie",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "genres",
+						"type": "String"
+					},
+					{
+						"name": "year",
+						"type": "String"
+					},
+					{
+						"name": "Rating",
+						"type": "String"
+					},
+					{
+						"name": "Rotton Tomato",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/moviesdbout')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_giriprasad_datalake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "output",
+						"fileSystem": "moviesdb"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/sql_foreach')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -615,6 +702,115 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/crimes')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "crimescsv",
+								"type": "DatasetReference"
+							},
+							"name": "crimescsv"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "crimes",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable2",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "filter1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          id as integer,",
+						"          case_number as string,",
+						"          date as string,",
+						"          block as string,",
+						"          iucr as string,",
+						"          primary_type as string,",
+						"          description as string,",
+						"          location_description as string,",
+						"          arrest as boolean,",
+						"          domestic as boolean,",
+						"          beat as short,",
+						"          district as short,",
+						"          ward as short,",
+						"          community_area as short,",
+						"          fbi_code as string,",
+						"          x_coordinate as integer,",
+						"          y_coordinate as integer,",
+						"          year as short,",
+						"          updated_on as string,",
+						"          latitude as double,",
+						"          longitude as double,",
+						"          {:@computed_region_awaf_s7ux} as short,",
+						"          {:@computed_region_6mkv_f3dw} as short,",
+						"          {:@computed_region_vrxf_vc4k} as short,",
+						"          {:@computed_region_bdys_3d7i} as short,",
+						"          {:@computed_region_43wa_7qmu} as short,",
+						"          {:@computed_region_rpca_8um6} as short,",
+						"          {:@computed_region_d9mm_jgwp} as short,",
+						"          {:@computed_region_d3ds_rm58} as short",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> crimescsv",
+						"crimescsv derive({date only} = left(date,10),",
+						"          time = right(date,12)) ~> derivedColumn1",
+						"derivedColumn1 aggregate(groupBy({day of week} = dayOfWeek(toDate({date only},'yyyy-mm-dd'))),",
+						"     iucr = count(iucr)) ~> aggregate1",
+						"derivedColumn1 filter(year(toDate({date only},'yyyy-mm-dd'))==2016) ~> filter1",
+						"filter1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/moviesDBconditionalsplit')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -700,7 +896,10 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/moviesdbip')]",
+				"[concat(variables('factoryId'), '/datasets/moviesdbout')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/moviesDBderivedcoln')]",
@@ -771,7 +970,10 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/moviesdbip')]",
+				"[concat(variables('factoryId'), '/datasets/moviesdbout')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/moviesDBexists')]",
@@ -848,7 +1050,10 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/moviesdbip')]",
+				"[concat(variables('factoryId'), '/datasets/moviesdbout')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/moviesDBlookup')]",
@@ -946,7 +1151,10 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/moviesdbip')]",
+				"[concat(variables('factoryId'), '/datasets/moviesdbout')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/moviesdb')]",
@@ -1007,7 +1215,10 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/moviesdbip')]",
+				"[concat(variables('factoryId'), '/datasets/moviesdbout')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/JoinAndAggregate_DataFlow')]",
@@ -1154,192 +1365,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/moviesDBderivedcoln')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/moviesDBexistes')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "moviesDBexists",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "moviesDBexists",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"moviesdbcsv": {},
-									"moviesdbcopycsv": {},
-									"moviesDBexistes": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2022-12-28T08:35:03Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/moviesDBexists')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/moviesDBlookup')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "moviesDBlookup",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "moviesDBlookup",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"moviesdbcsv": {},
-									"moviesdbcopycsv": {},
-									"moviesDBexistes": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2022-12-28T12:45:23Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/moviesDBlookup')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/moviesdB')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Data flow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "moviesdb",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"moviesdb": {},
-									"sink1": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2022-12-27T07:00:08Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/moviesdb')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Trigger_smu')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipeline": {
-					"pipelineReference": {
-						"referenceName": "CopyPipeline_tumblingwindow",
-						"type": "PipelineReference"
-					},
-					"parameters": {
-						"windowStart": {
-							"type": "Expression",
-							"value": "[parameters('Trigger_smu_properties_pipeline_parameters_windowStart')]"
-						},
-						"windowEnd": {
-							"type": "Expression",
-							"value": "[parameters('Trigger_smu_properties_pipeline_parameters_windowEnd')]"
-						}
-					}
-				},
-				"type": "TumblingWindowTrigger",
-				"typeProperties": {
-					"frequency": "Minute",
-					"interval": 5,
-					"startTime": "2023-01-05T06:25:00Z",
-					"delay": "00:00:00",
-					"maxConcurrency": 50,
-					"retryPolicy": {
-						"intervalInSeconds": 30
-					},
-					"dependsOn": []
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/CopyPipeline_tumblingwindow')]"
 			]
 		}
 	]

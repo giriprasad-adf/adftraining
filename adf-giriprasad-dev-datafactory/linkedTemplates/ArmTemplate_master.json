@@ -116,6 +116,26 @@
 					},
 					"AzureBlobStorage_connectionString": {
 						"value": "[parameters('AzureBlobStorage_connectionString')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-giriprasad-dev-datafactory_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "adf-giriprasad-dev-datafactory_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
 					},
 					"Trigger_smu_properties_pipeline_parameters_windowStart": {
 						"value": "[parameters('Trigger_smu_properties_pipeline_parameters_windowStart')]"
@@ -126,7 +146,7 @@
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'adf-giriprasad-dev-datafactory_ArmTemplate_0')]"
+				"[resourceId('Microsoft.Resources/deployments', 'adf-giriprasad-dev-datafactory_ArmTemplate_1')]"
 			]
 		}
 	]
