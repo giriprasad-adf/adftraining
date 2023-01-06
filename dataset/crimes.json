@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "crimes",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "adf_giriprasad_sqldb",
@@ -9,7 +9,8 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"table": "crimes2016"
+			"schema": "",
+			"table": "2016crimes"
 		}
 	}
 }

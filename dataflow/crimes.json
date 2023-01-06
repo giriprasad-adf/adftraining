@@ -15,14 +15,14 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "AzureSqlTable1",
+						"referenceName": "crimes",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
 				},
 				{
 					"dataset": {
-						"referenceName": "AzureSqlTable1",
+						"referenceName": "AzureSqlTable2",
 						"type": "DatasetReference"
 					},
 					"name": "sink2"
@@ -85,6 +85,7 @@
 				"     insertable:true,",
 				"     updateable:false,",
 				"     upsertable:false,",
+				"     recreate:true,",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
