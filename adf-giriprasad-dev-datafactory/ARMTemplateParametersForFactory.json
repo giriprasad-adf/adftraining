@@ -20,6 +20,9 @@
 		"adf_giriprasad_sqldb_connectionString": {
 			"value": ""
 		},
+		"HttpServerCrimesJson_properties_typeProperties_url": {
+			"value": "https://data.cityofchicago.org/resource/crimes.json?$limit=50000"
+		},
 		"adf_giriprasad_datalake_properties_typeProperties_url": {
 			"value": "https://adfgiriprasaddatalake.dfs.core.windows.net/"
 		},

@@ -28,6 +28,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'adf_giriprasad_sqldb'"
 		},
+		"HttpServerCrimesJson_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.cityofchicago.org/resource/crimes.json?$limit=50000"
+		},
 		"adf_giriprasad_datalake_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adfgiriprasaddatalake.dfs.core.windows.net/"
@@ -83,8 +87,8 @@
 					"adf_giriprasad_sqldb_connectionString": {
 						"value": "[parameters('adf_giriprasad_sqldb_connectionString')]"
 					},
-					"AzureBlobStorage_connectionString": {
-						"value": "[parameters('AzureBlobStorage_connectionString')]"
+					"HttpServerCrimesJson_properties_typeProperties_url": {
+						"value": "[parameters('HttpServerCrimesJson_properties_typeProperties_url')]"
 					},
 					"adf_giriprasad_datalake_properties_typeProperties_url": {
 						"value": "[parameters('adf_giriprasad_datalake_properties_typeProperties_url')]"
@@ -109,6 +113,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"AzureBlobStorage_connectionString": {
+						"value": "[parameters('AzureBlobStorage_connectionString')]"
 					},
 					"Trigger_smu_properties_pipeline_parameters_windowStart": {
 						"value": "[parameters('Trigger_smu_properties_pipeline_parameters_windowStart')]"
