@@ -1,0 +1,17 @@
+{
+	"name": "CrimesJson",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HttpServerCrimesJson",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			}
+		},
+		"schema": {}
+	}
+}
